@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id       String @id @default(uuid()) @db.Uuid
+  name     String @db.VarChar(50)
+  email    String @unique @db.VarChar(50)
+  password String @db.VarChar(50)
+  age      Int?
+
+  token String?
+
+  // classes Class[] // O estudante está em muitas turmas - relacionamento - forma implicita
+  enrollments Enrollment[] // O estudante tem matriculas
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile    Profile?
+  assessment Assessment[] // array de avaliações
+
+  @@map("students")
+}
+
+model Profile {
+  id       String    @id @default(uuid()) @db.Uuid
+  bio      String?   @db.VarChar(150)
+  image    String?   @db.VarChar(255)
+  birthday DateTime?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String  @unique @db.Uuid // Foreign key
+
+  @@map("profiles")
+}
+
+// Avaliações
+model Assessment {
+  id         String  @id @default(uuid()) @db.Uuid
+  discipline String  @db.VarChar(60)
+  grade      Decimal @db.Decimal(4, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String  @db.Uuid // Foreing key
+
+  @@map("assessments")
+}
+
+// Classes
+model Class {
+  id         String @id @default(uuid()) @db.Uuid
+  program    String @db.VarChar(60)
+  edition    String @db.VarChar(60)
+  maxStudent Int?   @map("max_student")
+  minStudent Int?   @map("min_student")
+
+  // sudents Student[] // A classe tem muitos estudantes - relacionamento - forma implicita
+  enrollments Enrollment[] // O estudante tem matriculas
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("classes")
+}
+
+// Incrição - Matricula
+model Enrollment {
+  studentId String @default(uuid()) @map("student_id") @db.Uuid
+  classId   String @default(uuid()) @map("class_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  student   Student  @relation(fields: [studentId], references: [id])
+  class     Class    @relation(fields: [classId], references: [id])
+
+  @@id([studentId, classId]) // As duas colunas serão Primary Key
+  @@map("enrollments")
+}
