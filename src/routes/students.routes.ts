@@ -32,7 +32,6 @@ router.get("/student/:studentId/assessment/:id", validateToken, assessmentContro
 router.put("/student/:studentId/assessment/:id", validateToken, assessmentController.update)
 
 // Deletar uma avaliação
-
 router.delete("/student/:studentId/assessment/:id", validateToken, assessmentController.delete)
 
 

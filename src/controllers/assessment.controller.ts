@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import { repository } from "../database/prisma.connection";
 import { Assessment } from "../models/assessment.model";
 
@@ -147,7 +148,13 @@ export class AssessmentController {
         message: "Detalhes da avaliação",
         data: assessment,
       });
-    } catch (error) {}
+    } catch (error) {
+      return response.status(500).json({
+        success: false,
+        code: response.statusCode,
+        message: "Erro ao mostrar detalhes da avaliação",
+      });
+    }
   }
 
   // update -> atualizar uma avaliação

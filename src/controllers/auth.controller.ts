@@ -23,6 +23,7 @@ export class AuthController {
           name: true,
           email: true,
           age: true,
+          token: true
         },
       });
 
